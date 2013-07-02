@@ -25,10 +25,8 @@ zcen = 47.30
 #LESS IMPORTANT STUFF
 hubble = 0.6711
 snapnum = 63
-#padlist = ['p6','p7','p8','p9','p10']
 padlist = ['p6','p7','p8']
 reslist = ['l11']
-#nvirlist= ['nvir3','nvir4','nvir5','nvir6','nvir7','nvir8','nvir9']
 nvirlist= ['nvir3','nvir6','nvir9']
 partypelist = np.linspace(1,nparttypes-1,nparttypes)
 
@@ -94,7 +92,7 @@ for res in reslist:
             rarr = np.logspace(-5,0,100) #in Mpc
             halopos = s.group_pos[subfhaloid,:]
 
-            rhoarr,p03r = densityprofile(rarr,filepath,header,haloparts,halopos,verbose=True,power03=True)
+            rhoarr,p03r = densityprofile(rarr,filepath,header,haloparts.SubIDs,halopos,verbose=True,power03=True)
             p03r = p03r*1000
             r200 = s.group_r_crit200[subfhaloid]*1000
 
@@ -122,17 +120,12 @@ for res in reslist:
                  weight='bold',
                  transform = ax1.transAxes)
         
-        #if figi == 29:
         if figi == 3:
             ax1.set_xlabel(r'$\mathrm{r\ [kpc/h]}$',size=14)
         else:
             ax1.set_xticklabels([])
         
-        #if figi == 1 or figi == 8 or figi == 15 or figi == 22 or figi == 29:
-        if True:
-            ax1.set_ylabel(r'$\mathrm{r^2 \rho(r)\ [10^{10}M_\odot/Mpc]}$',size=14)
-        else:
-            ax1.set_yticklabels([])
+        ax1.set_ylabel(r'$\mathrm{r^2 \rho(r)\ [10^{10}M_\odot/Mpc]}$',size=14)
 
     plt.legend(pltlist,nvirlist,loc="lower left")
-fig1.savefig(ictype + '-h' + str(haloid) + '-NFWprofiles.pdf',bbox_inches='tight')
+fig1.savefig("PLOTS/"+ictype + '-h' + str(haloid) + '-NFWprofiles.pdf',bbox_inches='tight')
