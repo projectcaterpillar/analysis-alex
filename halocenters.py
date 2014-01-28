@@ -26,7 +26,7 @@ if __name__=="__main__":
         print "Total not run:",len(halopathlist)-len(newpathlist)
         print "Number of relevant paths:",len(newpathlist)#,len(halopathlist)-len(newpathlist)
     else:
-        print "#haloname groupx groupy groupz subx suby subz"
+        print "#haloname lastsnap groupx groupy groupz subx suby subz"
 
     for outpath in newpathlist:
         lastsnap = sum(1 for line in open(outpath+'/ExpansionList'))-1
@@ -47,4 +47,4 @@ if __name__=="__main__":
             print "Group location:",groups.GroupCM[bestgroup,:]
             print "Largest sub location:",subcat.sub_cm[substart,:] 
         else:
-            print get_foldername(outpath),groupcm[0],groupcm[1],groupcm[2],subcm[0],subcm[1],subcm[2]
+            print get_foldername(outpath),lastsnap,groupcm[0],groupcm[1],groupcm[2],subcm[0],subcm[1],subcm[2]
