@@ -12,6 +12,10 @@ def check_last_subfind_exists(outpath):
     subhalo_tab = os.path.exists(outpath+'/outputs/groups_'+snapstr+'/subhalo_tab_'+snapstr+'.0')
     return group_tab and subhalo_tab
 
+def check_rockstar_exists(outpath):
+    ## TODO
+    pass
+
 if __name__=="__main__":
     verbose = False
     halopathlist = find_halo_paths(nrvirlist=[3,4,5,6],levellist=[11,12,13,14],ictype="BB",onlychecklastsnap=True,verbose=False)
