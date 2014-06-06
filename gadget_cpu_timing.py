@@ -19,6 +19,10 @@ if __name__=="__main__":
     parser = OptionParser()
     parser.add_option('-p','--percent',action='store_true',dest='percentplot',
                       default=False,help='plot percentages')
+    parser.add_option('-a','--scalefactor',action='store_true',dest='scalefactor',
+                      default=False,help='use scale factor instead of step')
+    parser.add_option('-z','--redshift',action='store_true',dest='redshift',
+                      default=False,help='use redshift instead of step')
     options,args = parser.parse_args()
     path = args[0]
     if not os.path.exists(path):
@@ -43,10 +47,16 @@ if __name__=="__main__":
         data[key] = np.array(val)
     
     plt.figure(); ax = plt.gca()
-    xlab = 'step' #step or time
-    x = data[xlab]; ax.set_xlabel(xlab)
-    labelstoplot = ['treegrav','pmgrav','domain']
-    colors = ['b','g','r','k']; alpha = 0.2
+    if options.scalefactor:
+        xlab = 'time'; x = data[xlab]
+    elif options.redshift:
+        xlab = 'redshift'; x = 1/data['time'] - 1
+    else:
+        xlab = 'step'; x = data[xlab]
+        
+    ax.set_xlabel(xlab)
+    labelstoplot = ['treegrav','pmgrav','domain','potential','misc']
+    colors = ['b','g','r','c','m','k']; alpha = 0.2
     assert len(colors) == len(labelstoplot)+1
     datatoplot = [np.zeros(len(x))]
     for label in labelstoplot:
@@ -54,14 +64,25 @@ if __name__=="__main__":
     datatoplot = np.array(datatoplot)
     datatoplot = np.cumsum(datatoplot,axis=0)
 
+    if 'treegrav' in labelstoplot:
+        treedata = np.array([data['treebuild'],data['treeupdate'],data['treewalk'],data['treecomm'],data['treeimbal']])
+        treedata = np.cumsum(treedata,axis=0)
     if options.percentplot:
         for i,label in enumerate(labelstoplot):
             datatoplot[i+1,:] = datatoplot[i+1,:]/data['total']
+        if 'treegrav' in labelstoplot:
+            for i in range(treedata.shape[0]):
+                treedata[i,:] = treedata[i,:]/data['total']
 
     for i,label in enumerate(labelstoplot):
         ax.fill_between(x,datatoplot[i,:],datatoplot[i+1,:],
                         facecolor=colors[i],alpha=alpha)
         ax.plot(x,datatoplot[i+1,:],colors[i],label=label)
+        if label=='treegrav':
+            for row,tlabel in enumerate(['treebuild','treeupdate','treewalk','treecomm','treeimbal']):
+                ax.fill_between(x,datatoplot[i,:],treedata[row,:],
+                                facecolor=colors[i],alpha=.05)
+                ax.text(x[-1],treedata[row,-1],tlabel,fontsize='xx-small',horizontalalignment='right')
 
     if options.percentplot:
         ax.fill_between(x,datatoplot[-1,:],1,
@@ -74,8 +95,10 @@ if __name__=="__main__":
                         facecolor=colors[-1],alpha=alpha)
         ax.plot(x,data['total'],colors[-1],label='total')
         ax.set_ylabel('cputime (sec?)')
-    ax.set_xlim((0,np.max(x)))
+    ax.set_xlim((np.min(x),np.max(x)))
+    if options.redshift:
+        ax.invert_xaxis()
     handles,labels = ax.get_legend_handles_labels()
-    ax.legend(handles[::-1],labels[::-1],loc='lower right')
+    ax.legend(handles[::-1],labels[::-1],loc='best')
     plt.tight_layout()
     plt.show()
